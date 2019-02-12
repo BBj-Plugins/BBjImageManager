@@ -1,0 +1,37 @@
+use ::ImageManager/ImageManager.bbj::ImageManager
+use java.util.ArrayList
+use javax.sql.rowset.serial.SerialBlob
+use java.sql.Blob
+
+declare ImageManager IM!
+declare ArrayList image!
+declare BBjImageManager imgManager!
+declare BBjSysGui SysGui!
+declare ArrayList Bloblist!
+declare ArrayList Savedlist!
+
+image! = new ArrayList()
+Bloblist! = new ArrayList()
+Savedlist! = new ArrayList()
+SysGui! = BBjAPI().openSysGui("X0")
+imgManager! = SysGui!.getImageManager()
+path! = "ImageManager\demo\images\landscape"
+
+for i! = 0 to 14
+    path! = path! + str(i!+1) +".jpeg"
+    image!.add(imgManager!.loadImageFromFile(path!))
+    Bloblist!.add(i!,new javax.sql.rowset.serial.SerialBlob(cast(BBjImage,image!.get(i!)).getBytes("jpg")))
+    path! = "ImageManager\demo\images\landscape"
+next i!
+
+IM! = new ImageManager()
+IM!.setImages(Bloblist!)
+if IM!.doModal() > 0 then 
+    Savedlist! = IM!.getImages()
+endif
+
+wait 2
+
+IM2! = new ImageManager()
+IM2!.setImages(Savedlist!)
+IM2!.doModal()

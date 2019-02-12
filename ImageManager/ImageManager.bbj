@@ -1,0 +1,1443 @@
+use ::DialogWizard/BBDialog.bbj::BBDialog
+use ::DialogWizard/DialogUtils.bbj::DialogUtils
+use ::DialogWizard/DialogWizardRun.bbj::DialogWizardRun
+use ::bbwindowutils.bbj::BBWindowUtils
+use java.util.HashMap
+use java.util.ArrayList
+use java.util.Arrays
+use java.awt.image.BufferedImage
+use java.io.File
+use java.io.IOException
+use javax.imageio.ImageIO
+use java.util.Collection
+use java.awt.MouseInfo
+use java.util.concurrent.TimeUnit
+use javax.sql.rowset.serial.SerialBlob
+use java.sql.Blob
+
+use ::ImageManager/src/Image.bbj::Image
+use ::BBXImage.bbj::BBXImage
+use ::BBXImage.bbj::BBXImageFactory
+use java.util.List
+
+class public ImageManager extends BBDialog
+
+    field protected BBjAPI        API! = BBjAPI()
+    field protected BBjNumber     TRUE = #API!.TRUE
+    field protected BBjNumber     FALSE = #API!.FALSE
+    field protected BBjSysGui     SysGui! = #API!.openSysGui("X0")
+    field protected BBjThinClient ThinClient! = #API!.getThinClient()
+    field protected BBjString     ClientLocale$ = #ThinClient!.getClientLocale()
+    field protected BBjString     PgmDirectory$ = pgm(-2)(1,max(pos("\"=pgm(-2),-1),pos("/"=pgm(-2),-1)))
+
+    field protected BBjNamespace  GroupNS! = #API!.getGroupNamespace()
+    field protected BBjMDI        MDI!
+
+    field public BBjString traceDir$
+    field public BBjString traceMode$
+    field public BBjNumber traceChan
+    field public BBjString traceFile$
+
+    field private ArrayList buttons!
+    field private ArrayList btnClose!
+    field private ArrayList images!
+    field private ArrayList insert!
+    field private BBjImage mainImg!
+    field private String darkRedIcon!
+    field private BBjPopupMenu popupMenu!
+
+    field private BBjTopLevelWindow Wnd!
+    field private BBjTopLevelWindow previewWnd!
+    field private BBjTopLevelWindow openDialog!
+    field private BBjTopLevelWindow saveDialog!
+    field private int index!
+    field private String wndTitle!
+    field private BBjImage wndIcon!
+    field private String wndIconPath!
+    field private int avContextPreview!
+    field private int avContextDialog!
+
+    REM Constanten
+    field private static String stdTitle! = "ImageManager"
+    field private static Image addPic!  
+    field private static int btnStdW! = 195
+    field private static int btnStdH! = 133
+	rem /** DLGWIZ_RES ImageManager
+	rem  * ImageManager.arc 101 **/
+
+	rem /** DLGWIZ_FLD_BEGIN **/
+	rem /** DLGWIZ_FLD_END **/
+
+
+	rem /** DLGWIZ_FLC_BEGIN **/
+	field protected BBjTopLevelWindow C_Window101!
+	field protected BBjButton C_btnMain!
+	field protected BBjButton C_btnPic0!
+	field protected BBjButton C_btnPic3!
+	field protected BBjButton C_btnPic1!
+	field protected BBjButton C_btnPic4!
+	field protected BBjButton C_btnPic2!
+	field protected BBjButton C_btnPic5!
+	field protected BBjButton C_btnPic6!
+	field protected BBjButton C_btnPic7!
+	field protected BBjButton C_btnPic8!
+	field protected BBjButton C_btnPic9!
+	field protected BBjButton C_btnPic10!
+	field protected BBjButton C_btnPic11!
+	field protected BBjButton C_btnPic12!
+	field protected BBjButton C_btnPic13!
+	field protected BBjButton C_btnPic14!
+	field protected BBjButton C_btnClose0!
+	field protected BBjButton C_btnClose1!
+	field protected BBjButton C_btnClose2!
+	field protected BBjButton C_btnClose3!
+	field protected BBjButton C_btnClose4!
+	field protected BBjButton C_btnClose5!
+	field protected BBjButton C_btnClose6!
+	field protected BBjButton C_btnClose7!
+	field protected BBjButton C_btnClose8!
+	field protected BBjButton C_btnClose9!
+	field protected BBjButton C_btnClose10!
+	field protected BBjButton C_btnClose11!
+	field protected BBjButton C_btnClose12!
+	field protected BBjButton C_btnClose13!
+	field protected BBjButton C_btnClose14!
+	field protected BBjButton C_btnInsert4!
+	field protected BBjButton C_btnInsert3!
+	field protected BBjButton C_btnInsert2!
+	field protected BBjButton C_btnInsert1!
+	field protected BBjButton C_btnInsert0!
+	field protected BBjButton C_btnInsert5!
+	field protected BBjButton C_btnInsert6!
+	field protected BBjButton C_btnInsert7!
+	field protected BBjButton C_btnInsert8!
+	field protected BBjButton C_btnInsert9!
+	field protected BBjButton C_btnInsert10!
+	field protected BBjButton C_btnInsert11!
+	field protected BBjButton C_btnInsert12!
+	field protected BBjButton C_btnInsert13!
+	field protected BBjButton C_btnInsert14!
+	field protected BBjButton C_btnInsert15!
+	field protected BBjButton C_btnInsert16!
+	field protected BBjButton C_btnInsert17!
+	field protected BBjButton C_btnSave!
+	field protected BBjButton C_btnCancel!
+	rem /** DLGWIZ_FLC_END **/
+
+
+
+    rem /**
+    rem * Constructor ImageManager
+    rem */
+    method public ImageManager()
+        #super!("ImageManager/res/ImageManager.arc",101)
+        #images! = new ArrayList()
+        rem Check if BBjSysGui object is still valid. If not re-create it.
+        #SysGui!.getContext(err=*next); sg_ok=1
+        if !sg_ok then
+            #SysGui!=#API!.openSysGui("X0")
+        endif
+
+        if stbl("+USER_LOCALE",err=*endif)<>"" then
+            #ClientLocale$ = stbl("+USER_LOCALE")
+        endif
+
+        #Wnd!=#super!.getWndTop()
+        if #API!.isInMDI() then #MDI!=#API!.getMDI()
+        
+        #popupMenu! = #SysGui!.addPopupMenu()
+        #popupMenu!.addMenuItem(-1,"öffnen")
+        #popupMenu!.addMenuItem(-2,"speichern unter")
+        
+        if #Wnd!<>null() then
+            #setCallbacks()
+        endif
+    methodend
+
+    rem /**
+    rem * Method setCallbacks:
+    rem * Set control callbacks
+    rem */
+    method protected void setCallbacks()
+        if #API!.isInMDI() then #MDI!.registerMDIClosingCallback(#this!,"onMDIClosing")
+        #GroupNS!.setCallbackForVariableChange("debug_mode",#this!,"doDebugTrace")
+        #GroupNS!.setCallbackForVariableChange("trace_mode",#this!,"doDebugTrace")
+		rem /** DLGWIZ_CBS_BEGIN **/
+		#super!.getControlByName("Window101").setCallback(BBjAPI.ON_CLOSE,#this!,"Window101__ON_CLOSE")
+		#super!.getControlByName("btnPic0").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic1").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic2").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic3").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic4").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic5").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic6").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic7").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic8").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic9").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic10").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic11").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic12").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic13").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnPic14").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btn_preview_ON_PUSH_EVENT")
+		#super!.getControlByName("btnClose0").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose1").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose2").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose3").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose4").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose5").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose6").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose7").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose8").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose9").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose10").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose11").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose12").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose13").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnClose14").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnRemoveImg__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnMain").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnMain__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnSave").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnSave__ON_BUTTON_PUSH")
+		#super!.getControlByName("btnPic0").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic1").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic2").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic3").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic4").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic5").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic6").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic7").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic8").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic9").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic10").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic11").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic12").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic13").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic14").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btns_ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnPic0").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic1").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic2").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic3").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic4").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic5").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic6").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic7").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic8").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic9").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic10").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic11").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic14").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic13").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnPic12").setCallback(BBjAPI.ON_POPUP_REQUEST,#this!,"btn__ON_POPUP_REQUEST")
+		#super!.getControlByName("btnInsert0").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert1").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert2").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert3").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert4").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert5").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert6").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert7").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert8").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert9").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert10").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert11").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert12").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert13").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert14").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert15").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert16").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnInsert17").setCallback(BBjAPI.ON_DROP_TARGET_DROP,#this!,"btnInsert__ON_DROP_TARGET_DROP")
+		#super!.getControlByName("btnCancel").setCallback(BBjAPI.ON_BUTTON_PUSH,#this!,"btnCancel__ON_BUTTON_PUSH")
+		#super!.getControlByName("Window101").setCallback(BBjAPI.ON_RESIZE,#this!,"Window101__ON_RESIZE")
+		rem /** DLGWIZ_CBS_END **/
+		#popupMenu!.getMenuItem(-1).setCallback(BBjAPI.ON_POPUP_ITEM_SELECT,#this!,"popupSelection")
+		#popupMenu!.getMenuItem(-2).setCallback(BBjAPI.ON_POPUP_ITEM_SELECT,#this!,"popupSelection")
+    methodend
+    
+    rem /**
+    rem * Method doDataExchange:
+    rem * Set controls with program variables
+    rem * @param BBjNumber pInitFlag: Controls are initialized, if true
+    rem */
+    method protected void doDataExchange(BBjNumber pInitFlag)
+		rem /** DLGWIZ_DDX_BEGIN **/
+		rem /** DLGWIZ_DDX_END **/
+
+    methodend
+
+    rem /**
+    rem * Method doModal:
+    rem * Initialize and display dialog (contains PROCESS_EVENTS)
+    rem * @see doDataExchange(BBjNumber pInitFlag)
+    rem * @see onInitDialog()
+    rem * @see onExitDialog()
+    rem * @return BBjNumber Answer: 0=Passed required fields check, 1=Dialog canceled/closed
+    rem */
+    method public BBjNumber doModal()
+        #API!.setCustomEventCallback("ReturnAnswer","do_return")
+        #API!.setCustomEventCallback("CancelAnswer","do_cancel")
+
+        #doDataExchange(#TRUE)
+        #super!.setAllValidated(#TRUE)
+
+        #onInitDialog()
+        
+         if #wndTitle! = null() then 
+            #C_Window101!.setTitle(#stdTitle!)
+        else    
+            #C_Window101!.setTitle(#wndTitle!)
+        endif
+
+        if !(#wndIcon! = null()) then 
+            #C_Window101!.setIcon(#wndIcon!,err=*next)
+        endif
+        
+        if !(#wndIconPath! = null()) then
+            #C_Window101!.setIcon(#wndIconPath!,err=*next)
+        endif
+        
+        #C_Window101!.setMinimumSize(1024,533)
+        #Wnd!.setVisible(#TRUE)
+        
+
+        REM LISTE  --buttons--
+        #buttons! = new ArrayList()
+        #buttons!.add(0,#C_btnPic0!)
+        #buttons!.add(1,#C_btnPic1!)
+        #buttons!.add(2,#C_btnPic2!)
+        #buttons!.add(3,#C_btnPic3!)
+        #buttons!.add(4,#C_btnPic4!)
+        #buttons!.add(5,#C_btnPic5!)
+        #buttons!.add(6,#C_btnPic6!)
+        #buttons!.add(7,#C_btnPic7!)
+        #buttons!.add(8,#C_btnPic8!)
+        #buttons!.add(9,#C_btnPic9!)
+        #buttons!.add(10,#C_btnPic10!)
+        #buttons!.add(11,#C_btnPic11!)
+        #buttons!.add(12,#C_btnPic12!)
+        #buttons!.add(13,#C_btnPic13!)
+        #buttons!.add(14,#C_btnPic14!)
+
+        REM LISTE --btnClose--
+        #btnClose! = new ArrayList()
+        #btnClose!.add(0,#C_btnClose0!)
+        #btnClose!.add(1,#C_btnClose1!)
+        #btnClose!.add(2,#C_btnClose2!)
+        #btnClose!.add(3,#C_btnClose3!)
+        #btnClose!.add(4,#C_btnClose4!)
+        #btnClose!.add(5,#C_btnClose5!)
+        #btnClose!.add(6,#C_btnClose6!)
+        #btnClose!.add(7,#C_btnClose7!)
+        #btnClose!.add(8,#C_btnClose8!)
+        #btnClose!.add(9,#C_btnClose9!)
+        #btnClose!.add(10,#C_btnClose10!)
+        #btnClose!.add(11,#C_btnClose11!)
+        #btnClose!.add(12,#C_btnClose12!)
+        #btnClose!.add(13,#C_btnClose13!)
+        #btnClose!.add(14,#C_btnClose14!)
+        #darkRedIcon! = "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"
+
+        REM LISTE --btnInsert--
+        #insert! = new ArrayList()
+        #insert!.add(0,#C_btnInsert0!)
+        #insert!.add(1,#C_btnInsert1!)
+        #insert!.add(2,#C_btnInsert2!)
+        #insert!.add(3,#C_btnInsert3!)
+        #insert!.add(4,#C_btnInsert4!)
+        #insert!.add(5,#C_btnInsert5!)
+        #insert!.add(6,#C_btnInsert6!)
+        #insert!.add(7,#C_btnInsert7!)
+        #insert!.add(8,#C_btnInsert8!)
+        #insert!.add(9,#C_btnInsert9!)
+        #insert!.add(10,#C_btnInsert10!)
+        #insert!.add(11,#C_btnInsert11!)
+        #insert!.add(12,#C_btnInsert12!)
+        #insert!.add(13,#C_btnInsert13!)
+        #insert!.add(14,#C_btnInsert14!)
+        #insert!.add(15,#C_btnInsert15!)
+        #insert!.add(16,#C_btnInsert16!)
+        #insert!.add(17,#C_btnInsert17!)
+        
+        
+        #avContextPreview! = -1
+        #avContextDialog! = -1
+        
+        img! = #SysGui!.getImageManager().loadImageFromFile("ImageManager/images/Cross.png")
+        imgObj! = new Image(img!,#btnStdH!,#btnStdW!)
+        #addPic! = cast(Image,imgObj!)
+
+        if #images!.size() < 15  then
+            #images!.add(#images!.size(),imgObj!) 
+        endif 
+        
+        if #images!.size() > 0 then 
+            for i = 0 to #images!.size() -1
+                declare BBjButton btn!
+                btn! = cast(BBjButton,#buttons!.get(i))
+                btn!.setDragEnabled(#TRUE)
+            next i 
+        endif
+        
+
+        for i! = 0 to  #btnClose!.size() -1 
+            declare BBjButton buffer!
+            buffer! = cast(BBjButton,#btnClose!.get(i!))
+            buffer!.setImage(#SysGui!.getImageManager().loadImageFromBytes(java.util.Base64.getDecoder().decode(#darkRedIcon!)))
+            buffer!.setImageSize(20,20)
+            buffer!.setToolTipText("Click to Delete current Picture")
+            buffer!.setEnabled(0)
+            buffer!.setVisible(0)
+        next i!
+                
+        #updateImages()
+        
+        do_process_events:
+            process_events,err=*same
+
+        do_return:
+            #doDataExchange(#FALSE)
+            if #super!.getAllValidated()=0 then
+                #super!.setAllValidated(#TRUE)
+                goto do_process_events
+            endif
+
+        do_cancel:
+            #onExitDialog()
+            #Wnd!.destroy()
+
+        methodret #super!.getAnswer()
+    methodend
+
+    rem /**
+    rem * Method onInitDialog:
+    rem * Your custom initialization
+    rem */
+    method public void onInitDialog()
+	rem /** DLGWIZ_INI_BEGIN **/
+	#C_Window101! = cast(BBjTopLevelWindow,#super!.getControlByName("Window101"))
+	#C_btnMain! = cast(BBjButton,#super!.getControlByName("btnMain"))
+	#C_btnPic0! = cast(BBjButton,#super!.getControlByName("btnPic0"))
+	#C_btnPic1! = cast(BBjButton,#super!.getControlByName("btnPic1"))
+	#C_btnPic2! = cast(BBjButton,#super!.getControlByName("btnPic2"))
+	#C_btnPic3! = cast(BBjButton,#super!.getControlByName("btnPic3"))
+	#C_btnPic4! = cast(BBjButton,#super!.getControlByName("btnPic4"))
+	#C_btnPic5! = cast(BBjButton,#super!.getControlByName("btnPic5"))
+	#C_btnPic6! = cast(BBjButton,#super!.getControlByName("btnPic6"))
+	#C_btnPic7! = cast(BBjButton,#super!.getControlByName("btnPic7"))
+	#C_btnPic8! = cast(BBjButton,#super!.getControlByName("btnPic8"))
+	#C_btnPic9! = cast(BBjButton,#super!.getControlByName("btnPic9"))
+	#C_btnPic10! = cast(BBjButton,#super!.getControlByName("btnPic10"))
+	#C_btnPic11! = cast(BBjButton,#super!.getControlByName("btnPic11"))
+	#C_btnPic12! = cast(BBjButton,#super!.getControlByName("btnPic12"))
+	#C_btnPic13! = cast(BBjButton,#super!.getControlByName("btnPic13"))
+	#C_btnPic14! = cast(BBjButton,#super!.getControlByName("btnPic14"))
+	#C_btnClose0! = cast(BBjButton,#super!.getControlByName("btnClose0"))
+	#C_btnClose1! = cast(BBjButton,#super!.getControlByName("btnClose1"))
+	#C_btnClose2! = cast(BBjButton,#super!.getControlByName("btnClose2"))
+	#C_btnClose3! = cast(BBjButton,#super!.getControlByName("btnClose3"))
+	#C_btnClose4! = cast(BBjButton,#super!.getControlByName("btnClose4"))
+	#C_btnClose5! = cast(BBjButton,#super!.getControlByName("btnClose5"))
+	#C_btnClose6! = cast(BBjButton,#super!.getControlByName("btnClose6"))
+	#C_btnClose7! = cast(BBjButton,#super!.getControlByName("btnClose7"))
+	#C_btnClose8! = cast(BBjButton,#super!.getControlByName("btnClose8"))
+	#C_btnClose9! = cast(BBjButton,#super!.getControlByName("btnClose9"))
+	#C_btnClose10! = cast(BBjButton,#super!.getControlByName("btnClose10"))
+	#C_btnClose11! = cast(BBjButton,#super!.getControlByName("btnClose11"))
+	#C_btnClose12! = cast(BBjButton,#super!.getControlByName("btnClose12"))
+	#C_btnClose13! = cast(BBjButton,#super!.getControlByName("btnClose13"))
+	#C_btnClose14! = cast(BBjButton,#super!.getControlByName("btnClose14"))
+	#C_btnInsert0! = cast(BBjButton,#super!.getControlByName("btnInsert0"))
+	#C_btnInsert1! = cast(BBjButton,#super!.getControlByName("btnInsert1"))
+	#C_btnInsert2! = cast(BBjButton,#super!.getControlByName("btnInsert2"))
+	#C_btnInsert3! = cast(BBjButton,#super!.getControlByName("btnInsert3"))
+	#C_btnInsert4! = cast(BBjButton,#super!.getControlByName("btnInsert4"))
+	#C_btnInsert5! = cast(BBjButton,#super!.getControlByName("btnInsert5"))
+	#C_btnInsert6! = cast(BBjButton,#super!.getControlByName("btnInsert6"))
+	#C_btnInsert7! = cast(BBjButton,#super!.getControlByName("btnInsert7"))
+	#C_btnInsert8! = cast(BBjButton,#super!.getControlByName("btnInsert8"))
+	#C_btnInsert9! = cast(BBjButton,#super!.getControlByName("btnInsert9"))
+	#C_btnInsert10! = cast(BBjButton,#super!.getControlByName("btnInsert10"))
+	#C_btnInsert11! = cast(BBjButton,#super!.getControlByName("btnInsert11"))
+	#C_btnInsert12! = cast(BBjButton,#super!.getControlByName("btnInsert12"))
+	#C_btnInsert13! = cast(BBjButton,#super!.getControlByName("btnInsert13"))
+	#C_btnInsert14! = cast(BBjButton,#super!.getControlByName("btnInsert14"))
+	#C_btnInsert15! = cast(BBjButton,#super!.getControlByName("btnInsert15"))
+	#C_btnInsert16! = cast(BBjButton,#super!.getControlByName("btnInsert16"))
+	#C_btnInsert17! = cast(BBjButton,#super!.getControlByName("btnInsert17"))
+	#C_btnSave! = cast(BBjButton,#super!.getControlByName("btnSave"))
+	#C_btnCancel! = cast(BBjButton,#super!.getControlByName("btnCancel"))
+	rem /** DLGWIZ_INI_END **/
+
+    rem uncomment the next line to center window
+    rem BBWindowUtils.centerWindow(#Wnd!)
+    #doDebugTrace(null())
+    methodend
+
+    rem /**
+    rem * Method onExitDialog:
+    rem * Your custom exit code
+    rem */
+    method public void onExitDialog()
+        if #traceChan then
+            call "bbtracer.bbj::stopTrace",#traceChan
+            call "bbtracer.bbj::showTrace",#traceFile$,#traceMode$
+        endif
+    methodend
+
+    rem /**
+    rem * Method postCancelAnswer:
+    rem * Set dialog answer to "canceled"
+    rem */
+    method public void postCancelAnswer()
+        #super!.setAnswer(0)
+        #API!.postCustomEvent("CancelAnswer",null())
+    methodend
+
+    rem /**
+    rem * Method postReturnAnswer:
+    rem * Set dialog answer to "normal return"
+    rem */
+    method public void postReturnAnswer()
+        #super!.setAnswer(1)
+        #API!.postCustomEvent("ReturnAnswer",null())
+    methodend
+
+    rem /**
+    rem * Method onMDIClosing:
+    rem * Handler for the MDI closing
+    rem */
+    method public void onMDIClosing(BBjMDIClosingEvent pEvent!)
+        rem uncomment the next line to veto the MDI Close
+        rem #MDI!.vetoMDIClose()
+        #MDI!.approveMDIClose()
+        #postCancelAnswer()
+    methodend
+
+    rem /**
+    rem * Method doDebugTrace:
+    rem * Show/hide console, start/stop trace
+    rem * @param BBjNamespaceEvent event! 
+    rem */
+    method public void doDebugTrace(BBjNamespaceEvent event!)
+        debug_mode = #GroupNS!.getValue("debug_mode",err=*next)>0
+        trace_mode = #GroupNS!.getValue("trace_mode",err=*next)>0
+
+        if debug_mode then
+            seterr 0
+            setesc 0
+            print(0)'show'
+        else
+REM             print(0)'hide'
+        endif
+
+        if trace_mode then
+            traceDir$=#traceDir$, traceMode$=#traceMode$, traceChan=#traceChan, traceFile$=#traceFile$
+            call "bbtracer.bbj::startTrace",traceDir$,traceMode$,traceChan,traceFile$
+            #traceDir$=traceDir$, #traceMode$=traceMode$, #traceChan=traceChan, #traceFile$=traceFile$
+        else
+            if #traceChan then
+                traceChan=#traceChan
+                call "bbtracer.bbj::stopTrace",traceChan
+                #traceChan=traceChan
+                call "bbtracer.bbj::showTrace",#traceFile$,#traceMode$
+            endif
+        endif
+    methodend
+
+	rem /**
+	rem  * Method btnMain__ON_DROP_TARGET_DROP: 
+	rem  * Event handler for the ON_DROP_TARGET_DROP event for btnMain
+	rem  * @param BBjDropTargetDropEvent: contains the dropped data 
+	rem  */
+	method public void btns_ON_DROP_TARGET_DROP(BBjDropTargetDropEvent e!)
+	    declare HashMap data!
+	    declare String path!
+	    declare int dragID!
+	    declare int dropID!
+	    
+	    data! = e!.getData()
+	    path! = str(data!.get("application/x-java-file-list"))
+	    path! = path!.replace("[","")
+	    path! = path!.replace("]","")
+	    split! = java.util.Arrays.asList(path!.split(","))
+	   
+	    if e!.getDragSource() <> null() then
+	        dragID! = e!.getDragSource().getID() -1
+	        dropID! = e!.getControl().getID() - 1
+	        
+	        if dropID! < #images!.size()
+	            #switchImage(dragID!,dropID!)
+	        endif
+	    else
+	        #placeImages(split!)
+	    endif
+	methodend
+	
+    REM  /**
+    REM  * Method placeImages:
+    REM  * Places the Images given in to the Buttons
+    REM  * @param data!: a list wich includes paths of the pictures
+    REM  */
+	method private void placeImages(java.util.List data!)
+	    declare Image imgObj!
+	    declare BBjButton btn!
+        declare BBjButton btnRemove!
+        declare BBjImage img!
+	    declare int max!
+	    declare int current!
+	    declare int new!
+        declare int rest!
+        declare Boolean option!
+	    
+	    max! = #buttons!.size()
+	    current! = #images!.size()
+	    
+ 	    data! = #checkImages(data!)
+	    new! = data!.size()
+	    
+	    if (current! < max! and (current! + new!) <= max!) then
+	        #images!.remove(#addPic!)
+	        for i! = 0 to new! -1
+	            img! = #SysGui!.getImageManager().loadImageFromFile(cast(String,data!.get(i!)).trim())
+	            imgObj! = new Image(img!,#btnStdH!,#btnStdW!)
+	            #images!.add(imgObj!)
+	        next i!
+	        #images!.add(#addPic!)
+        else
+            #images!.remove(#addPic!)
+            max! = #buttons!.size()
+            current! = #images!.size()
+            new! = data!.size()
+            rest! = (current! + new!) - max!
+           
+            if #images!.size() < 15 then
+                for i! = 0 to (new! - rest!) -1
+                    img! = #SysGui!.getImageManager().loadImageFromFile(cast(String,data!.get(i!)).trim())
+                    imgObj! = new Image(img!,#btnStdH!,#btnStdW!)
+                    #images!.add(imgObj!)
+                next i!
+            endif
+        endif
+	    #updateImages()
+	methodend
+	
+    REM /**
+    REM  * Method checkImages: 
+    REM  * Checks if the given list with paths are paths to the valid pictures formats(jpg,png,jfif)
+    REM  * @param dataList!: contains the paths to the pictures
+    REM  * @return returns a list with the non-valid paths removed
+    REM  */
+	method private java.util.List checkImages(java.util.List dataList!)
+	    declare String buffer!
+	    declare ArrayList arrayList!
+	    
+        arrayList! = new ArrayList(Arrays.asList(dataList!.toArray()))
+	    for i = arrayList!.size() -1 to 0 step -1
+	        buffer! = dataList!.get(i).toString()
+	        if !(buffer!.contains(".jpg")) and !(buffer!.contains(".png")) and !(buffer!.contains(".jfif")) then
+	            arrayList!.remove(i)
+	        endif
+	    next i
+	    
+	    dataList! = cast(java.util.List,arrayList!)
+	    
+	    methodret dataList!
+	methodend
+	
+	
+    REM /**
+    REM  * Method switchImage:
+    REM  * The method simply switches to images position and then updates the preview image and then calls #updateImage
+    REM  * @param sourceIndex!: the position of the picture that was dragged
+    REM  * @param aimIndex!:  the position the picture was dragged to 
+    REM  */
+	method private void switchImage(int sourceIndex!, int aimIndex!)
+	    declare Image tmpImg!
+	    declare Image plus!
+	    
+	    tmpImg! = cast(Image,#images!.get(sourceIndex!))
+	    plus! = cast(Image,#images!.get(aimIndex!))
+	    
+	    if plus! = #addPic! then 
+	        methodret
+	    endif
+	    
+	    #images!.set(sourceIndex!,cast(Image,#images!.get(aimIndex!)))
+	    #images!.set(aimIndex!,tmpImg!)
+	        
+	    #mainImg! = cast(Image,#images!.get(0)).getImage()
+	    #updateImages()
+	    
+	methodend
+	
+    REM /**
+    REM  * Method insertImage:
+    REM  * The method inserts a dragged picture between 2 other pictures
+    REM  * @param sourceID!: the id of the button the picture that was dragged
+    REM  * @param  destinationID!: the id of the button between the pictures  
+    REM  */
+	method private void insertImage(int sourceID!, int destinationID!)
+	    declare Image tmpImg!
+	    declare BBjButton btn!
+	    
+	    tmpImg! = cast(Image,#images!.get(sourceID!)) 
+	    #images!.remove(sourceID!)
+	    
+	    if #images!.contains(#addPic!) then 
+	        #images!.remove(#addPic!)
+	    endif   
+	    
+	    offsetRow1 = 1
+	    offsetRow2 = 2
+	    offsetRow3 = 3
+	    
+	    if destinationID! > 12 then
+	        offset = 2
+	    else
+	        if destinationID! > 5 then
+	            offset = 1
+	        endif
+	    endif
+	    
+	    if sourceID! > destinationID! - offset then
+	        offsetRow1 = 0
+	        offsetRow2 = 1
+	        offsetRow3 = 2
+	    endif          
+        
+        dest! = destinationID!
+        
+	    switch destinationID!
+	        case 0
+	                break
+	        case 1
+	        case 2
+	        case 3
+	        case 4
+	        case 5
+	        case 6; dest! = destinationID! - offsetRow1
+	                break
+	        case 7
+	        case 8
+	        case 9
+	        case 10
+	        case 11
+	        case 12; dest! = destinationID! - offsetRow2
+	                 break
+	        case 13
+	        case 14
+	        case 15
+	        case 16
+	        case 17; dest! = destinationID! - offsetRow3
+	    swend
+	    if dest! > #images!.size() then
+	        #images!.add(tmpImg!)
+	    else
+	        #images!.add(dest!,tmpImg!)
+	    endif 
+
+	    #updateImages()
+	methodend
+
+	rem /**
+	rem  * Method Window101__ON_CLOSE: 
+	rem  * Event handler for the ON_CLOSE event for Window101, the preview window and the dialog window
+	rem  * @param BBjCloseEvent
+	rem  */
+	method public void Window101__ON_CLOSE(BBjCloseEvent pEvent!)
+	    
+	    if pEvent!.getControl().getContextID() = #avContextPreview! then 
+	        #C_Window101!.setEnabled(1)
+	        #previewWnd!.destroy()
+	    else 
+	        if pEvent!.getControl().getContextID() = #avContextDialog! then
+	            #openDialog!.destroy()
+	            #Wnd!.setEnabled(#TRUE)
+	        else
+	            #postCancelAnswer()
+	        endif
+	    endif
+	methodend
+
+	rem /**
+	rem  * Method btn_preview_ON_PUSH_EVENT: 
+	rem  * Event handler for the ON_BUTTON_PUSH event for all Buttons that contain pictures
+	rem  * if the button does not contain any picutre a dialog window will open and you can select a picture
+	rem  * if the button does contain an picture the method puts the picture in the preview button 
+	rem  * @param BBjButtonPushEvent: contians the information wich button was pressed 
+	rem  */
+	method public void btn_preview_ON_PUSH_EVENT(BBjButtonPushEvent pEvent!)
+	    declare String buffer!
+	    declare BBjButton btn!
+	    declare String openDir!
+	    
+	    buffer! = #C_Window101!.getControl(pEvent!.getControl().getID()).getName()
+	    buffer! = buffer!.replaceAll("[a-zA-Z]","")
+	    
+	    if num(buffer!) = #images!.size() -1 and #images!.contains(#addPic!) then
+	        openDir! = BBjAPI().getThinClient().getUserProperty("Image-Manager-OpenDialog", err=*next)
+        
+	        if openDir! = null() then
+	            openDir! = System.getProperty("user.home")
+	        endif
+	        #avContextDialog! = #SysGui!.getAvailableContext()
+
+	        #openDialog! = #SysGui!.addWindow(#avContextDialog!,#Wnd!.getX(),#Wnd!.getY(),#Wnd!.getWidth(),#Wnd!.getHeight(),"File Dialog")
+	        #Wnd!.setEnabled(#FALSE)
+	        #openDialog!.setCallback(BBjAPI.ON_CLOSE,#this!,"Window101__ON_CLOSE")
+        
+            #initOpenDialog(openDir!,$0004$)
+	    else 
+    	    if #images!.size() > num(buffer!) then
+        	    #mainImg! = cast(Image,#images!.get(num(buffer!))).getImage()
+        	    if #mainImg!.getHeight() > #C_btnMain!.getHeight() and #mainImg!.getWidth() > #C_btnMain!.getWidth() then
+        	        #C_btnMain!.setImage(cast(Image,#images!.get(num(buffer!))).getScaledImage(#C_btnMain!.getWidth(),#C_btnMain!.getHeight()))
+        	    else 
+        	        #C_btnMain!.setImage(cast(Image,#images!.get(num(buffer!))).getImage())
+        	    endif
+    	    endif
+	    endif
+	methodend
+	
+	
+    REM /**
+    REM  * Method Window_ON_KEYPRESS:
+    REM  * Checks if ESC is pressed and gif so closes the preview window.
+    REM  * @param BBjKeypressEvent
+    REM  */
+	method public void Window__On_KEYPRESS(BBjKeypressEvent kEvent!)
+	    if (kEvent!.getKeyCode() = 27 and #previewWnd!.isDestroyed() <> #TRUE) then
+	        #previewWnd!.destroy()
+	        #C_Window101!.setEnabled(1)
+	    endif
+	methodend
+	
+	rem /**
+	rem  * Method btnRemoveImg__ON_BUTTON_PUSH: 
+	rem  * Simply removes an image from the list
+	rem  * Event handler for the ON_BUTTON_PUSH event for all btnClose
+	rem  * @param BBjButtonPushEvent: contains the information wich button was pressed
+	rem  */
+	method public void btnRemoveImg__ON_BUTTON_PUSH(BBjButtonPushEvent pEvent!)
+	    declare String buffer!
+        declare int size!
+        
+        buffer! = #C_Window101!.getControl(pEvent!.getControl().getID()).getName()
+        buffer! = buffer!.replaceAll("[a-zA-Z]","")
+
+        size! = num(buffer!)
+        if size! < #images!.size() then
+            #images!.remove(size!)
+            if !(#images!.contains(#addPic!)) then
+                #images!.add(#addPic!)
+            endif
+            #updateImages()
+		endif
+	methodend
+
+    REM /**
+    REM  * Mehtod updateImages:
+    REM  * Updates the UI  
+    REM  */
+	method private void updateImages()
+    	declare BBjButton btn!
+    	declare BBjButton btnClose!
+    	declare Image buffer!
+    	declare BBjImage img!
+    	
+    	for i = 0 to #buttons!.size() -1 
+    	    btn! = cast(BBjButton, #buttons!.get(i))
+    	    btnClose! = cast(BBjButton, #btnClose!.get(i))
+    	    
+    	    if i < #images!.size() then
+    	        btn!.setImage(cast(Image,#images!.get(i)).getScaledImage())
+    	        btn!.setDragEnabled(#TRUE)
+    	        btnClose!.setVisible(1)
+    	        btnClose!.setEnabled(1)
+    	        
+    	        if #images!.contains(#addPic!) then
+    	            btnP! = cast(BBjButton, #buttons!.get(#images!.indexOf(#addPic!)))
+    	            btnP!.setDragEnabled(#FALSE)
+    	            
+    	            btnC! = cast(BBjButton, #btnClose!.get(#images!.indexOf(#addPic!)))
+    	            btnC!.setVisible(0)
+                    btnC!.setEnabled(0)
+    	        else
+    	            if #images!.size() -1 < 14 then
+    	                #images!.add(#addPic!)
+    	            endif
+    	        endif
+    	    else
+    	        btn!.setImage(null())
+    	        btn!.setDragEnabled(#FALSE)
+    	        btnClose!.setVisible(0)
+    	        btnClose!.setEnabled(0)
+    	    endif 
+    	next i
+    	
+    	img! = cast(Image,#images!.get(0)).getImage()
+    	if  #images!.size() > 0  and img! = #addPic!  then
+    	    
+    	    if (img!.getHeight() > #C_btnMain!.getHeight()) and (img!.getWidth() > #C_btnMain!.getWidth())
+    	        buffer! = new Image()
+    	        #mainImg! = img!
+    	        #C_btnMain!.setImage(buffer!.scaleImage(img!,#C_btnMain!.getWidth(),#C_btnMain!.getWidth()))
+    	    else 
+    	        #mainImg! = img!
+    	        #C_btnMain!.setImage(cast(Image,#images!.get(0)).getImage())
+            endif
+        else
+   	        #C_btnMain!.setImage(null())
+   	        #mainImg! = null()
+   	    endif
+	methodend
+	
+	rem /**
+	rem  * Method btnMain__ON_BUTTON_PUSH: 
+	rem  * Event handler for the ON_BUTTON_PUSH event for btnMain
+	rem  * Creates a new window with the picture that was in it 
+	rem  * @param BBjButtonPushEvent
+	rem  */
+	method public void btnMain__ON_BUTTON_PUSH(BBjButtonPushEvent pEvent!)
+	    declare Image img!
+	    declare int xposi!
+	    declare int yposi!
+	    
+	    img! = new Image()
+	    #avContextPreview! = #SysGui!.getAvailableContext()
+	    
+	    if #mainImg! <> null() then
+    	    xposi! = cast(int,960 - (#mainImg!.getWidth()/2))
+    	    yposi! = cast(int,540 - (#mainImg!.getHeight()/2))
+    	    
+    	    if #previewWnd! = null() or #previewWnd!.isDestroyed()  then 
+    	        #previewWnd! = #SysGui!.addWindow(#avContextPreview!,0,0,1920,1080,"Image View")
+    	        #C_Window101!.setEnabled(0)
+    	        #previewWnd!.maximize()
+    	        
+    	        if (#mainImg!.getHeight() > #previewWnd!.getHeight()) and (#mainImg!.getWidth() > #previewWnd!.getWidth()) then 
+    	            #previewWnd!.addImageCtrl(1000,xposi!,yposi!,#mainImg!.getWidth(),#mainImg!.getHeight(),img!.scaleImage(#mainImg!,1920,1080))
+    	        else    
+    	            #previewWnd!.addImageCtrl(1000,xposi!,yposi!,#mainImg!.getWidth(),#mainImg!.getHeight(),#mainImg!)
+    	        endif   
+    	         
+    	        #previewWnd!.setCallback(BBjAPI.ON_CLOSE,#this!,"Window101__ON_CLOSE")
+    	        #previewWnd!.setCallback(#previewWnd!.ON_KEYPRESS,#this!,"Window__On_KEYPRESS")
+    	    endif 
+	    endif
+	methodend
+	
+	rem /**
+	rem  * Method btnSave__ON_BUTTON_PUSH: 
+	rem  * Event handler for the ON_BUTTON_PUSH event for btnSave
+	rem  * 
+	rem  * @param BBjButtonPushEvent
+	rem  */
+	method public void btnSave__ON_BUTTON_PUSH(BBjButtonPushEvent pEvent!)
+	    #postReturnAnswer()
+	methodend
+	
+    REM /**
+    REM  * Method popupSelection
+    REM  * @param BBjPopupSelectEvent
+    REM  */
+	method public void popupSelection(BBjPopupSelectEvent e!)
+	    declare BBjFileChooser fch!
+	    declare String openDir!
+	    declare String saveDir!
+
+	    openDir! = BBjAPI().getThinClient().getUserProperty("Image-Manager-OpenDialog", err=*next)
+	    saveDir! = BBjAPI().getThinClient().getUserProperty("Image-Manager-SaveDialog", err=*next)
+	    
+	    if openDir! = null() then
+	        openDir! = System.getProperty("user.home")
+	    endif
+	    
+	    if saveDir! = null() then 
+	        saveDir! = System.getProperty("user.home")
+	    endif
+	       
+	    #avContextDialog! = #SysGui!.getAvailableContext()
+        #openDialog! = #SysGui!.addWindow(#avContextDialog!,#Wnd!.getX(),#Wnd!.getY(),#Wnd!.getWidth(),#Wnd!.getHeight(),"File Dialog")
+        #Wnd!.setEnabled(#FALSE)
+        #openDialog!.setCallback(BBjAPI.ON_CLOSE,#this!,"Window101__ON_CLOSE")
+        
+  	    if e!.getMenuItem().getID() = -1 then
+  	        #initOpenDialog(openDir!,$0004$)
+	    else
+	        #initSaveDialog(saveDir!,$0104$)
+	    endif
+	    
+	methodend
+	
+	REM /**
+    REM  * Method initOpenDialog 
+    REM  * sets up the dialog
+    REM  * @param dir!: the directory the dialog is set to 
+    REM  * @param flag!: decides if the dialog is open oder a save dialog
+    REM  */
+	method private void initOpenDialog(String dir!, String flag!)
+        declare BBjFileChooser fch!
+        fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
+        fch!.setMultiSelectionEnabled(1)
+        fch!.setApproveButtonText("hinzufügen")
+        fch!.setFileSelectionMode(fch!.FILES_ONLY)
+        fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!,"approveOpen")
+        fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
+        fch!.addFileFilter("Jpg","*.jpg")
+        fch!.addFileFilter("Png","*.png")
+        fch!.addFileFilter("Jfif","*.jfif")
+        fch!.setActiveFileFilter("Jpg")
+        fch!.setAcceptAllFileFilterUsed(0)
+        fch!.focus()
+	methodend
+	
+	REM /**
+    REM  * Method initSaveDialog 
+    REM  * sets up the dialog
+    REM  * @param dir!: the directory the dialog is set to 
+    REM  * @param flag!: decides if the dialog is open oder a save dialog
+    REM  */
+	method private void initSaveDialog(String dir!, String flag!)
+	    declare BBjFileChooser fch!
+        fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
+        fch!.setApproveButtonText("speichern")
+        fch!.setFileSelectionMode(fch!.FILES_ONLY)
+        fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!, "approveSave")
+        fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
+        fch!.addFileFilter("Jpg","*.jpg")
+        fch!.addFileFilter("Png","*.png")
+        fch!.setText("image.png")
+        fch!.focus()
+    methodend
+	
+	REM /**
+	REM  * Method approveOpen:
+	REM  * processes the data from the open dialog 
+	REM  * @param BBjFileChooserApproveEvent: contains the data
+	REM  */ 
+	method public void approveOpen(BBjFileChooserApproveEvent e!)
+	    declare BBjFileChooser fch!
+	    declare String path!
+	    declare BBjImage img!
+	    declare Image image!
+	    declare String buffer!
+	    declare String data!
+	    
+	    fch! = e!.getFileChooser()
+  	    BBjAPI().getThinClient().setUserProperty("Image-Manager-OpenDialog",fch!.getCurrentDirectory()) 
+	    path! = fch!.getCurrentDirectory()
+	    path! = path! + "/"
+	    
+	    data! = fch!.getText()
+	    
+	    if !(data!.contains("""")) then
+	        data! = path! + data!
+	        split! = java.util.Arrays.asList(data!)
+            #placeImages(split!)
+            #Wnd!.setEnabled(#TRUE)
+            #openDialog!.destroy() 
+            methodret
+	    endif
+	    
+	    data! = data!.replaceAll("""","")
+	    data! = data!.trim()
+	    data! = data!.replaceAll(" ",",")
+	    
+	    split! = java.util.Arrays.asList(data!.split(","))
+	    
+	    for i = 0 to split!.size() -2
+	        buffer! = path! + split!.get(i).toString()
+	        split!.set(i,buffer!)
+	    next i
+	    
+	    buffer! = path! + split!.get(split!.size() -1).toString()
+	    split!.set(split!.size() -1,buffer!)
+	    
+	    #placeImages(split!)
+	    #Wnd!.setEnabled(#TRUE)
+        #openDialog!.destroy()
+	methodend 
+	
+	REM /**
+    REM  * Method approveSave:
+    REM  * Saves the image to the selected path
+    REM  * can only save as .png or .jpg
+    REM  * @param BBjFileChooserApproveEvent: returns the filechooser object
+    REM  */
+    method public void approveSave(BBjFileChooserApproveEvent e!)
+        declare BBjFileChooser fch!
+        declare String extension!
+        declare BBXImage img!
+        declare String path! 
+        
+        fch! = e!.getFileChooser()
+        BBjAPI().getThinClient().setUserProperty("Bilder-Manager-SaveDialog",fch!.getCurrentDirectory())
+        extension! = fch!.getText()
+        extension! = extension!.substring(extension!.indexOf(".")+1)
+        img! = new BBXImage(cast(Image,#images!.get(#index!)).getImage())
+        path! = fch!.getCurrentDirectory() + "/" +fch!.getText()
+        if extension! = "png" then
+            #Wnd!.setEnabled(#TRUE)
+            img!.saveAsPNG(path!)
+            #openDialog!.destroy()
+        else 
+            if extension! = "jpg"  then
+                #Wnd!.setEnabled(#TRUE)
+                img!.saveAsJPG(path!,0)
+                #openDialog!.destroy()
+            else 
+                a = MSGBOX("Please choose .png or .jpg",0,"Message")
+            endif
+        endif
+    methodend 	
+    
+    REM /**
+    REM  * Method cancel:
+    REM  * Destroys the dialog
+    REM  * @param BBjFileChooserCancelEvent
+    REM  * 
+    REM  */
+    method public void cancel(BBjFileChooserCancelEvent e!)
+        #openDialog!.destroy()
+        #Wnd!.setEnabled(#TRUE)
+    methodend
+	
+	rem /**
+	rem  * Method btn__ON_POPUP_REQUEST: 
+	rem  * Event handler for the ON_POPUP_REQUEST event for btnPic 0-15
+	rem  * @param BBjPopupRequestEvent: contains the id of the button that caused the event
+	rem  */
+	method public void btn__ON_POPUP_REQUEST(BBjPopupRequestEvent e!)
+	    declare BBjButton btn!
+	    declare Image plus!
+
+	    #index! = e!.getControl().getID() -1
+	    btn! = cast(BBjButton,#buttons!.get(#index!))
+
+	    if #index! < #images!.size() then 
+	        plus! = cast(Image,#images!.get(#index!))
+	    endif
+
+        if plus! = #addPic! then 
+            methodret 
+        else
+            btn!.setPopupMenu(#popupMenu!)
+            #popupMenu!.show(btn!,30,40)
+    
+            if #images!.size() <= #index! then 
+                #popupMenu!.getMenuItem(-2).setEnabled(0)
+                #popupMenu!.getMenuItem(-1).setEnabled(1)
+            else
+                #popupMenu!.getMenuItem(-2).setEnabled(1)
+                #popupMenu!.getMenuItem(-1).setEnabled(0)
+            endif
+            btn!.removePopupMenu()
+        endif
+	methodend
+	
+    REM /**
+    REM  * Method setImages:
+    REM  * Sets the images
+    REM  * @param images!: an arraylist that contains blobs 
+    REM  */
+	method public void setImages(ArrayList images!)
+	    declare int size! 
+	    declare Blob blob!
+	    declare byte[] bytes! 
+	    declare BBjImage img!
+	    declare Image imgObj!
+	    declare BBjButton btn!
+	    size! = images!.size() -1
+	    
+	    if !(images!.isEmpty()) then  
+    	    if size! < 15 then
+    	        for i! = 0 to size!
+    	            blob! = cast(Blob,images!.get(i!))
+    	            bytes! = blob!.getBytes(new Long(1),int(blob!.length() -1))
+    	            img! = #SysGui!.getImageManager().loadImageFromBytes(bytes!)
+    	            imgObj! = new Image(img!,#btnStdH!,#btnStdW!)
+    	            if i! = 0 then 
+    	                #mainImg! = imgObj!.getImage()
+    	            endif  
+    	            #images!.add(i!,imgObj!)
+    	        next i!
+    	    else
+    	        for i! = 0 to 14 
+    	            blob! = cast(Blob,images!.get(i!))
+    	            bytes! = blob!.getBytes(new Long(1),int(blob!.length() -1))
+    	            img! = #SysGui!.getImageManager().loadImageFromBytes(bytes!)
+    	            imgObj! = new Image(img!,#btnStdH!,#btnStdW!)
+    	            if i! = 0 then 
+    	                #mainImg! = imgObj!.getImage()
+    	            endif  
+    	            #images!.add(i!,imgObj!)
+                next i!
+    	    endif
+	    endif
+    methodend
+        
+	rem /**
+	rem  * Method btnInsert__ON_DROP_TARGET_DROP: 
+	rem  * Event handler for the ON_DROP_TARGET_DROP event for btnInsert
+	rem  * @param BBjDropTargetDropEvent: contains the id of the button that caused the event and the data that was dragged in to the button
+	rem  */
+	method public void btnInsert__ON_DROP_TARGET_DROP(BBjDropTargetDropEvent e!)
+	    declare int destinationID!
+	    declare int sourceID!
+	    declare BBjButton btn!
+	    declare HashMap data!
+	    declare String path!
+	    
+	    ID! = e!.getControl().getID()
+	    data! = e!.getData()
+	    
+        path! = str(data!.get("application/x-java-file-list"))
+        path! = path!.replace("[","")
+        path! = path!.replace("]","")
+        split! = java.util.Arrays.asList(path!.split(","))
+        
+        if e!.getDragSource() <> null() then
+            sourceID! = e!.getDragSource().getID() -1
+            destinationID! = e!.getControl().getID() - 1000
+            #insertImage(sourceID!,destinationID!)
+        else
+            #placeImages(split!)
+        endif
+	methodend
+	
+	REM /**
+    REM  * Method setTitle
+    REM  * Sets the title of the main window
+    REM  * @param title!: a String, if not set the default title is used  
+    REM  */
+	method public void setTitle(String title!)
+        if title! = "" then
+            title! = #stdTitle!
+        endif    
+        #wndTitle! = title!
+    methodend
+    
+    REM /**
+    REM  * Method setIcon:
+    REM  * @param image!: BBjImage that will be the new Icon of the main window
+    REM  */
+    method public void setIcon(BBjImage image!)
+        #wndIcon! = image!
+    methodend
+    
+    REM /**
+    REM  * Method setIcon:
+    REM  * @param path!: the position of the icon as an absolute path
+    REM  */
+    method public void setIcon(String path!)
+        #wndIconPath! = path! 
+    methodend
+    
+	rem /**
+	rem  * Method btnCancel__ON_BUTTON_PUSH:
+	rem  * Event handler for the ON_BUTTON_PUSH event for btnCancel
+	rem  * @param BBjButtonPushEvent
+	rem  */
+	method public void btnCancel__ON_BUTTON_PUSH(BBjButtonPushEvent pEvent!)
+	    a = msgbox("Unsaved changes will be dismissed",1,"Warning")
+	    if a = 1 then 
+	        #postCancelAnswer()
+	    endif    
+	methodend
+	
+	REM /** 
+	REM  * Method Window101__ON_RESIZE:
+	REM  * creates a Timer and calls the method doResize 
+    REM  * @param BBjResizeEvent
+    REM  */
+	method public void Window101__ON_RESIZE(BBjResizeEvent pEvent!)
+        BBjAPI().createTimer("on_resize_timer",.2,#this!,"doResize")
+    methodend
+
+	rem /**
+	rem  * Method Window101__ON_RESIZE: 
+	rem  * Resizes the window properly 
+	rem  * Event handler for the ON_RESIZE event for Window101
+	rem  * @param BBjResizeEvent
+	rem  */
+	method public void doResize(BBjTimerEvent pEvent!)
+	    declare int const!
+        declare Image buffer!
+        declare BBjImage img!
+	    
+	    const! = 10
+	    w = #C_Window101!.getWidth()
+	    h = #C_Window101!.getHeight()
+	      
+	    REM Repostioning of the Elements
+	    REM 1.(1535 * 0.32573) ; rem main button in % 32,573 (width)
+	    REM 2.(494 * 0.88866) ; rem main button in % 88,866 (heigth)
+	    REM 3.(1535 * 0.127035) ; rem image button in % 12,7035 (width)
+	    REM 4.(494 * 0.26923) ; rem image button in % 26,923 (heigth)
+    
+	    mainW! = (w * 0.32573)
+	    mainH! = (h * 0.88866)
+         
+	    bildBtnW! = (w * 0.127035)
+	    bildBtnH! = (h * 0.26923)
+         
+        checkW = (6 * const!) + mainW! + (5 * bildBtnW!)  
+
+        if checkW < w then 
+            diff = w - checkW
+            bildBtnW! = bildBtnW! + (diff/ 5)  
+        endif 
+        
+        if checkW > w  then
+            diff = checkW - w
+            bildBtnW! = (w - diff) *  0.127035
+            mainW! = (w - diff) * 0.32573
+        endif
+        
+        checkH = (4 * const!) + (3 * bildBtnH!)
+        
+        if mainH! > checkH then 
+            mainH! = checkH
+        endif
+
+	    #C_btnMain!.setLocation(0,0)
+	    #C_btnMain!.setSize(mainW!,mainH!)
+	    
+	    leisteH! = 0
+	    leisteW! = w - mainW!
+         
+	    #C_btnLeiste0!.setLocation(mainW!,leisteH!)
+	    #C_btnLeiste0!.setSize(leisteW!,10)
+	    
+	    leisteH! = leisteH! + bildBtnH! + const!
+         
+	    #C_btnLeiste1!.setLocation(mainW!,leisteH!)
+	    #C_btnLeiste1!.setSize(leisteW!,10)
+	    leisteH! = leisteH! + bildBtnH! + const!
+         
+	    #C_btnLeiste2!.setLocation(mainW!,leisteH!)
+	    #C_btnLeiste2!.setSize(leisteW!,10)
+	    leisteH! = leisteH! + bildBtnH! + const!
+         
+	    #C_btnLeiste3!.setLocation(mainW!,leisteH!)
+	    #C_btnLeiste3!.setSize(leisteW!,10)
+         
+	    w! = mainW!
+         
+	    for x! = 0 to 5 
+            
+	        a = 1000 + x!
+            b = 1006 + x!
+            c = 1012 + x!
+            
+            insertBtnCol1! = #C_Window101!.getControl(a) 
+            insertBtnCol2! = #C_Window101!.getControl(b)
+            insertBtnCol3! = #C_Window101!.getControl(c)
+            
+            h! = const!
+            insertBtnCol1!.setLocation(w!,h!)
+            insertBtnCol1!.setSize(const!,bildBtnH!)
+            
+            h! = h! + bildBtnH! + const!
+            insertBtnCol2!.setLocation(w!,h!)
+            insertBtnCol2!.setSize(const!,bildBtnH!)
+            
+            h! = h! + bildBtnH! + const!
+            insertBtnCol3!.setLocation(w!,h!)
+            insertBtnCol3!.setSize(const!,bildBtnH!)
+              
+            w! = w! + bildBtnW! + const!
+        next x!
+        
+        w! =  mainW! + const!
+    
+        for i! = 1 to 5 
+    
+            a =  i!
+            b = 5 + i!
+            c = 10 + i!
+            
+            d = 899 + i!
+            e = 904 + i!
+            f = 909 + i!
+            
+            btnRow1! = #C_Window101!.getControl(a)
+            btnRow2! = #C_Window101!.getControl(b)
+            btnRow3! = #C_Window101!.getControl(c)
+            
+            closeBtnRow1! = #C_Window101!.getControl(d)
+            closeBtnRow2! = #C_Window101!.getControl(e)
+            closeBtnRow3! = #C_Window101!.getControl(f)
+            
+            h! = const!
+              
+            btnRow1!.setLocation(w!,h!)
+            btnRow1!.setSize(bildBtnW!,bildBtnH!)
+            	        
+            closeW! = btnRow1!.getX() + btnRow1!.getWidth() - closeBtnRow1!.getWidth()
+            closeBtnRow1!.setLocation(closeW!,btnRow1!.getY())
+    
+            h! = h! + bildBtnH! + const!
+            
+            btnRow2!.setLocation(w!,h!)
+            btnRow2!.setSize(bildBtnW!,bildBtnH!)
+            closeBtnRow2!.setLocation(closeW!,btnRow2!.getY())
+            
+            h! = h! + bildBtnH! + const!
+            
+            btnRow3!.setLocation(w!,h!)
+            btnRow3!.setSize(bildBtnW!,bildBtnH!)
+            closeBtnRow3!.setLocation(closeW!,btnRow3!.getY())
+            
+            closeW! = closeW! + btnRow1!.getX() + btnRow1!.getWidth() - closeBtnRow1!.getWidth()
+            w! = w! + bildBtnW! + const!
+            
+        next  i!
+        
+        abstandW = (w * 0.03030)
+        abstandH = (h * 0.00977) 
+        
+        #C_btnSave!.setLocation(w - 105,h -35)
+        #C_btnCancel!.setLocation(w -210 ,h -35)
+        
+        BBjAPI().removeTimer("on_resize_timer",err=*next)
+        
+	methodend
+	
+	Rem /** 
+    Rem  * Method getImages:
+    Rem  * @return returns a arraylist full of blobs. 
+    Rem  */
+	method public ArrayList getImages()
+	    declare ArrayList blob!
+	    
+	    blob! = new ArrayList()
+	    
+	    if #images!.contains(#addPic!) then
+	        #images!.remove(#addPic!)
+	    endif
+	      
+	    if !(#images!.isEmpty()) then 
+	        for i = 0 to #images!.size() -1
+	            blob!.add(i,new javax.sql.rowset.serial.SerialBlob((cast(Image,#images!.get(i)).getImage()).getBytes("png")))
+	        next i 
+	    endif
+	    
+	    methodret blob!
+	methodend
+classend
+
+declare ImageManager myDialog!
+myDialog! = new ImageManager()
+rem /** DLGWIZ_SET_BEGIN **/
+rem /** DLGWIZ_SET_END **/
+
+
+if myDialog!.doModal() and info(3,6)<>"5" then
+    print 'show',
+    print "Passed required fields check"
+rem /** DLGWIZ_GET_BEGIN **/
+rem /** DLGWIZ_GET_END **/
+
+    input "Press ENTER to release",dummy$
+endif
+
+release

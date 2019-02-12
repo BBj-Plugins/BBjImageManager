@@ -1,0 +1,91 @@
+use ::BBXImage.bbj::BBXImage
+
+class public Image 
+
+    field private BBjImage img!
+    field private BBjImage scaledImg!
+    field private int width!
+    field private int height!
+    field private BBXImage bbxImg!
+    
+    REM /**
+    REM  * Method Image:
+    REM  * Constructor
+    REM  */
+    method public Image()
+    methodend
+
+    REM /**
+    REM  * Method Image
+    REM  * 
+    REM  * @param image!
+    REM  * @param width!
+    REM  * @param height!
+    REM  */
+    method public Image(BBjImage image!,int width!, int height!)
+        #img! = image!
+        #width! = width!
+        #height! = height!
+        
+        #bbxImg! = new BBXImage(image!)
+        #bbxImg!.scaleHeight(height!)
+        #bbxImg!.scaleWidth(width!)
+        #scaledImg! = #bbxImg!.getBBjImage() 
+    methodend
+    
+    REM /**
+    REM  * Method scaleImage:
+    REM  * 
+    REM  * @param
+    REM  * @param
+    REM  * @param
+    REM  * 
+    REM  * @return
+    REM  */
+    method public BBjImage scaleImage(BBjImage image!, int width!, int height!)
+        declare BBXImage bbxImg!
+        
+        bbxImg! = new BBXImage(image!)
+        bbxImg!.scaleHeight(height!)
+        bbxImg!.scaleWidth(width!)
+        image! = bbxImg!.getBBjImage()
+        methodret image! 
+    methodend
+    
+    REM /**
+    REM  * Method getImage:
+    REM  * 
+    REM  * @return 
+    REM  */
+    method public BBjImage getImage()
+        methodret #img!
+    methodend
+    
+    REM /**
+    REM  * Method getScaledImage:
+    REM  * 
+    REM  * @return
+    REM  */
+    method public BBjImage getScaledImage()
+        methodret #scaledImg!
+    methodend
+    
+    REM /**
+    REM  * Method getScaledImage
+    REM  * 
+    REM  * @param width!
+    REM  * @param height!
+    REM  * 
+    REM  * @return
+    REM  * 
+    REM  */
+    method public BBjImage getScaledImage(int width!, int height!)
+        declare BBXImage bbxImg!
+        
+        bbxImg! = new BBXImage(#img!)
+        bbxImg!.scaleHeight(width!)
+        bbxImg!.scaleWidth(height!)
+        scaledImg! = bbxImg!.getBBjImage()
+        methodret scaledImg!
+    methodend
+classend
