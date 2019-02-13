@@ -29,9 +29,3 @@ IM!.setImages(Bloblist!)
 if IM!.doModal() > 0 then 
     Savedlist! = IM!.getImages()
 endif
-
-wait 2
-
-IM2! = new ImageManager()
-IM2!.setImages(Savedlist!)
-IM2!.doModal()

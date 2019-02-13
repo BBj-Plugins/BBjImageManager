@@ -1,0 +1,9 @@
+use ::ImageManager/ImageManager.bbj::ImageManager
+
+declare ImageManager IM!
+
+IM! = new ImageManager()
+
+if IM!.doModal() > 0 then 
+    Savedlist! = IM!.getImages()
+endif
