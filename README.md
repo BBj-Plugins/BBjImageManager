@@ -1,1 +1,1 @@
-# BBjImageManager
+# ImageManager
