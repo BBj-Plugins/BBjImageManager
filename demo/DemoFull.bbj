@@ -10,6 +10,8 @@ declare BBjSysGui SysGui!
 declare ArrayList Bloblist!
 declare ArrayList Savedlist!
 
+print 'HIDE'
+
 image! = new ArrayList()
 Bloblist! = new ArrayList()
 Savedlist! = new ArrayList()

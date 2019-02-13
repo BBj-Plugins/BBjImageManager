@@ -523,7 +523,7 @@ class public ImageManager extends BBDialog
             setesc 0
             print(0)'show'
         else
-REM             print(0)'hide'
+            print(0)'hide'
         endif
 
         if trace_mode then
