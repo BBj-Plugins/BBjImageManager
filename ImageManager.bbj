@@ -355,7 +355,6 @@ class public ImageManager extends BBDialog
         #insert!.add(16,#C_btnInsert16!)
         #insert!.add(17,#C_btnInsert17!)
         
-        
         #avContextPreview! = -1
         #avContextDialog! = -1
         

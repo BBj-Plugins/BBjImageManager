@@ -9,12 +9,5 @@
     "screenshots": [
       "",
       ""
-    ],
-    "plugin_dependencies": [
-      {
-        "plugin_name": "ImageManager",
-        "plugin_version": "master",
-        "project_url": "https://github.com/BBj-Plugins/ImageManager"
-      }
     ]
   }
