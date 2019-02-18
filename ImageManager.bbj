@@ -952,7 +952,7 @@ class public ImageManager extends BBDialog
         declare BBjFileChooser fch!
         fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
         fch!.setMultiSelectionEnabled(1)
-        fch!.setApproveButtonText("hinzufügen")
+        fch!.setApproveButtonText("open")
         fch!.setFileSelectionMode(fch!.FILES_ONLY)
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!,"approveOpen")
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
@@ -972,7 +972,7 @@ class public ImageManager extends BBDialog
 	method private void initSaveDialog(String dir!, String flag!)
 	    declare BBjFileChooser fch!
         fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
-        fch!.setApproveButtonText("speichern")
+        fch!.setApproveButtonText("save")
         fch!.setFileSelectionMode(fch!.FILES_ONLY)
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!, "approveSave")
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
