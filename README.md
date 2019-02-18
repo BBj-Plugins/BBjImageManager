@@ -1,8 +1,8 @@
  # ImageManager
 
- ##Introduction
+ ## Introduction
 First of all, this is what en empty ImageManager looks like.
-!(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/ImageManagerEmpty.PNG)
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
 The Imagemanager can contain an maximum of **15** images.
 **Note**<br>
 <ul>
@@ -12,9 +12,9 @@ The Imagemanager can contain an maximum of **15** images.
 </ul>
  
 You can change the Title and the Icon.
-!(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/ImageManagerTitlebar.PNG)
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerTitlebar.PNG)
 
- ##Usage 
+ ## Usage 
 
 They are 3 ways to get images in the ImageManager while it is running. <br>
 You can also use setImages so the ImageManager allready opens with Images.
@@ -25,8 +25,8 @@ You can also use setImages so the ImageManager allready opens with Images.
 <li>The popup menu</li>
 </ol>
  
- ###Drag and Drop
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/ImageManagerDragAndDrop.jpg
+ ### Drag and Drop
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerDragAndDrop.jpg)
 
 **Note**
 <ul>
@@ -36,9 +36,9 @@ You can also use setImages so the ImageManager allready opens with Images.
 <li>You can drag images between 2 to insert it there.</li>
 </ul>
 
- ###The **plus** Button  
+ ### The **plus** Button  
 If you right click the button with the **plus** icon a file dialog will open up and you can navigate to the location where your images are. 
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/ImageManagerEmpty.PNG)
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerOpenDialog.PNG)
 **Note** <br>
 <ul>
 <il>You can not drag the **plus**.</il>
@@ -51,7 +51,7 @@ If you right click the button with the **plus** icon a file dialog will open up 
 <li>The dialog can also be closed with the **esc** key.</li>
 </ul>
 
- ###The Popup menu
+ ### The Popup menu
 If you left click on a button a popup menu will apear.
 The popup menu has 2 options
 <ol>
@@ -61,7 +61,7 @@ The popup menu has 2 options
 	<li>Will open an save dialog.</li>	
 </ol>
  
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
 
 **Note** <br>
 <ul>
@@ -73,13 +73,13 @@ The popup menu has 2 options
 <il>The dialog can also be closed with the **esc** key.</li>
 </ul>
 
- ###The preview Button
+ ### The preview Button
 The preview button is the bigger button one on the left side.
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
 If you right click on an image it will set in this button.
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
 If you then click on that big button an new Window will open up with the image, so you can see images with greater heights and widths better.
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
 You can close the window by pressing **esc** or pressing the **X**
 
 **Note** <br>
@@ -89,16 +89,16 @@ You can close the window by pressing **esc** or pressing the **X**
 <il>The window is always gonna be fullscreen suitable for your screenbounds</il> 
 </ul>
  
- ###Mooving the images
+ ### Mooving the images
 You can drag one image on to another one and they will switch places.
 Also they are little seperators between each button. You can drag images on to them. 
 This will cause the image to go between the two images the seperator was located.
 Here an example
-(https://github.com/BBj-Plugins/ImageManager/blob/master/docs/screenshots/
+!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
 
- ###The cancel button
+ ### The cancel button
 This button will bring up an popup wich will ask you if you really want to close the programm or else unsaved changes will be discarded.
 If you hit **ok** it will close, if you hit **cancel** you will be able to continue to use the ImageManager.
 
- ###The save button 
+ ### The save button 
 Saves the current state of the ImageManager, wich means if you have 10 images in it, it will close and return an blob array of the images. 
