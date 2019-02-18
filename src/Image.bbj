@@ -9,18 +9,16 @@ class public Image
     field private BBXImage bbxImg!
     
     REM /**
-    REM  * Method Image:
     REM  * Constructor
     REM  */
     method public Image()
     methodend
 
     REM /**
-    REM  * Method Image
-    REM  * 
-    REM  * @param image!
-    REM  * @param width!
-    REM  * @param height!
+    REM  * Constructor with params
+    REM  * @param image!: The image, must be an BBjImage
+    REM  * @param width!: The width wich the image gets scalled to
+    REM  * @param height!: The height wich the image gets scalled to
     REM  */
     method public Image(BBjImage image!,int width!, int height!)
         #img! = image!
@@ -34,13 +32,12 @@ class public Image
     methodend
     
     REM /**
-    REM  * Method scaleImage:
     REM  * 
-    REM  * @param
-    REM  * @param
-    REM  * @param
+    REM  * @param image!: The image, must be an BBjImage
+    REM  * @param width!: The width of the image
+    REM  * @param height!: The height of the image
     REM  * 
-    REM  * @return
+    REM  * @return returns the scaled image
     REM  */
     method public BBjImage scaleImage(BBjImage image!, int width!, int height!)
         declare BBXImage bbxImg!
@@ -53,30 +50,27 @@ class public Image
     methodend
     
     REM /**
-    REM  * Method getImage:
     REM  * 
-    REM  * @return 
+    REM  * @return returns a BBjImage
     REM  */
     method public BBjImage getImage()
         methodret #img!
     methodend
     
     REM /**
-    REM  * Method getScaledImage:
     REM  * 
-    REM  * @return
+    REM  * @return returns the scaled Image
     REM  */
     method public BBjImage getScaledImage()
         methodret #scaledImg!
     methodend
     
     REM /**
-    REM  * Method getScaledImage
+    REM  * @param width!: the new width 
+    REM  * @param height! the new height
     REM  * 
-    REM  * @param width!
-    REM  * @param height!
-    REM  * 
-    REM  * @return
+    REM  * Note: does not overwrite the intern variable
+    REM  * @return returns the new scaled image
     REM  * 
     REM  */
     method public BBjImage getScaledImage(int width!, int height!)

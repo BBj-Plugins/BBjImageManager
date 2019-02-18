@@ -1,11 +1,9 @@
 
 {
     "name": "ImageManager",
-    "description": "",
+    "description": "Display and manage your images.",
     "version": "",
     "author": "Basis",
-    "licence": "MIT",
-    "bbj_dependency": "",
     "screenshots": [
       "",
       ""

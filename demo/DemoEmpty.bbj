@@ -9,3 +9,4 @@ if IM!.doModal() > 0 then
     Savedlist! = IM!.getImages()
 endif
 
+release

@@ -57,7 +57,6 @@ class public ImageManager extends BBDialog
     field private int avContextPreview!
     field private int avContextDialog!
 
-    REM Constanten
     field private static String stdTitle! = "ImageManager"
     field private static Image addPic!  
     field private static int btnStdW! = 195
@@ -155,7 +154,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method setCallbacks:
     rem * Set control callbacks
     rem */
     method protected void setCallbacks()
@@ -252,7 +250,6 @@ class public ImageManager extends BBDialog
     methodend
     
     rem /**
-    rem * Method doDataExchange:
     rem * Set controls with program variables
     rem * @param BBjNumber pInitFlag: Controls are initialized, if true
     rem */
@@ -263,7 +260,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method doModal:
     rem * Initialize and display dialog (contains PROCESS_EVENTS)
     rem * @see doDataExchange(BBjNumber pInitFlag)
     rem * @see onInitDialog()
@@ -405,7 +401,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method onInitDialog:
     rem * Your custom initialization
     rem */
     method public void onInitDialog()
@@ -470,7 +465,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method onExitDialog:
     rem * Your custom exit code
     rem */
     method public void onExitDialog()
@@ -481,7 +475,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method postCancelAnswer:
     rem * Set dialog answer to "canceled"
     rem */
     method public void postCancelAnswer()
@@ -490,7 +483,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method postReturnAnswer:
     rem * Set dialog answer to "normal return"
     rem */
     method public void postReturnAnswer()
@@ -499,7 +491,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method onMDIClosing:
     rem * Handler for the MDI closing
     rem */
     method public void onMDIClosing(BBjMDIClosingEvent pEvent!)
@@ -510,7 +501,6 @@ class public ImageManager extends BBDialog
     methodend
 
     rem /**
-    rem * Method doDebugTrace:
     rem * Show/hide console, start/stop trace
     rem * @param BBjNamespaceEvent event! 
     rem */
@@ -541,7 +531,6 @@ class public ImageManager extends BBDialog
     methodend
 
 	rem /**
-	rem  * Method btnMain__ON_DROP_TARGET_DROP: 
 	rem  * Event handler for the ON_DROP_TARGET_DROP event for btnMain
 	rem  * @param BBjDropTargetDropEvent: contains the dropped data 
 	rem  */
@@ -570,7 +559,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
     REM  /**
-    REM  * Method placeImages:
     REM  * Places the Images given in to the Buttons
     REM  * @param data!: a list wich includes paths of the pictures
     REM  */
@@ -618,7 +606,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
     REM /**
-    REM  * Method checkImages: 
     REM  * Checks if the given list with paths are paths to the valid pictures formats(jpg,png,jfif)
     REM  * @param dataList!: contains the paths to the pictures
     REM  * @return returns a list with the non-valid paths removed
@@ -642,7 +629,6 @@ class public ImageManager extends BBDialog
 	
 	
     REM /**
-    REM  * Method switchImage:
     REM  * The method simply switches to images position and then updates the preview image and then calls #updateImage
     REM  * @param sourceIndex!: the position of the picture that was dragged
     REM  * @param aimIndex!:  the position the picture was dragged to 
@@ -667,7 +653,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
     REM /**
-    REM  * Method insertImage:
     REM  * The method inserts a dragged picture between 2 other pictures
     REM  * @param sourceID!: the id of the button the picture that was dragged
     REM  * @param  destinationID!: the id of the button between the pictures  
@@ -736,7 +721,6 @@ class public ImageManager extends BBDialog
 	methodend
 
 	rem /**
-	rem  * Method Window101__ON_CLOSE: 
 	rem  * Event handler for the ON_CLOSE event for Window101, the preview window and the dialog window
 	rem  * @param BBjCloseEvent
 	rem  */
@@ -756,7 +740,6 @@ class public ImageManager extends BBDialog
 	methodend
 
 	rem /**
-	rem  * Method btn_preview_ON_PUSH_EVENT: 
 	rem  * Event handler for the ON_BUTTON_PUSH event for all Buttons that contain pictures
 	rem  * if the button does not contain any picutre a dialog window will open and you can select a picture
 	rem  * if the button does contain an picture the method puts the picture in the preview button 
@@ -797,7 +780,6 @@ class public ImageManager extends BBDialog
 	
 	
     REM /**
-    REM  * Method Window_ON_KEYPRESS:
     REM  * Checks if ESC is pressed and gif so closes the preview window.
     REM  * @param BBjKeypressEvent
     REM  */
@@ -809,7 +791,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	rem /**
-	rem  * Method btnRemoveImg__ON_BUTTON_PUSH: 
 	rem  * Simply removes an image from the list
 	rem  * Event handler for the ON_BUTTON_PUSH event for all btnClose
 	rem  * @param BBjButtonPushEvent: contains the information wich button was pressed
@@ -832,7 +813,6 @@ class public ImageManager extends BBDialog
 	methodend
 
     REM /**
-    REM  * Mehtod updateImages:
     REM  * Updates the UI  
     REM  */
 	method private void updateImages()
@@ -889,7 +869,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	rem /**
-	rem  * Method btnMain__ON_BUTTON_PUSH: 
 	rem  * Event handler for the ON_BUTTON_PUSH event for btnMain
 	rem  * Creates a new window with the picture that was in it 
 	rem  * @param BBjButtonPushEvent
@@ -924,7 +903,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	rem /**
-	rem  * Method btnSave__ON_BUTTON_PUSH: 
 	rem  * Event handler for the ON_BUTTON_PUSH event for btnSave
 	rem  * 
 	rem  * @param BBjButtonPushEvent
@@ -934,7 +912,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
     REM /**
-    REM  * Method popupSelection
     REM  * @param BBjPopupSelectEvent
     REM  */
 	method public void popupSelection(BBjPopupSelectEvent e!)
@@ -967,7 +944,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	REM /**
-    REM  * Method initOpenDialog 
     REM  * sets up the dialog
     REM  * @param dir!: the directory the dialog is set to 
     REM  * @param flag!: decides if the dialog is open oder a save dialog
@@ -989,7 +965,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	REM /**
-    REM  * Method initSaveDialog 
     REM  * sets up the dialog
     REM  * @param dir!: the directory the dialog is set to 
     REM  * @param flag!: decides if the dialog is open oder a save dialog
@@ -1008,7 +983,6 @@ class public ImageManager extends BBDialog
     methodend
 	
 	REM /**
-	REM  * Method approveOpen:
 	REM  * processes the data from the open dialog 
 	REM  * @param BBjFileChooserApproveEvent: contains the data
 	REM  */ 
@@ -1056,7 +1030,6 @@ class public ImageManager extends BBDialog
 	methodend 
 	
 	REM /**
-    REM  * Method approveSave:
     REM  * Saves the image to the selected path
     REM  * can only save as .png or .jpg
     REM  * @param BBjFileChooserApproveEvent: returns the filechooser object
@@ -1089,7 +1062,6 @@ class public ImageManager extends BBDialog
     methodend 	
     
     REM /**
-    REM  * Method cancel:
     REM  * Destroys the dialog
     REM  * @param BBjFileChooserCancelEvent
     REM  * 
@@ -1100,7 +1072,6 @@ class public ImageManager extends BBDialog
     methodend
 	
 	rem /**
-	rem  * Method btn__ON_POPUP_REQUEST: 
 	rem  * Event handler for the ON_POPUP_REQUEST event for btnPic 0-15
 	rem  * @param BBjPopupRequestEvent: contains the id of the button that caused the event
 	rem  */
@@ -1133,7 +1104,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
     REM /**
-    REM  * Method setImages:
     REM  * Sets the images
     REM  * @param images!: an arraylist that contains blobs 
     REM  */
@@ -1174,7 +1144,6 @@ class public ImageManager extends BBDialog
     methodend
         
 	rem /**
-	rem  * Method btnInsert__ON_DROP_TARGET_DROP: 
 	rem  * Event handler for the ON_DROP_TARGET_DROP event for btnInsert
 	rem  * @param BBjDropTargetDropEvent: contains the id of the button that caused the event and the data that was dragged in to the button
 	rem  */
@@ -1203,7 +1172,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	REM /**
-    REM  * Method setTitle
     REM  * Sets the title of the main window
     REM  * @param title!: a String, if not set the default title is used  
     REM  */
@@ -1215,7 +1183,6 @@ class public ImageManager extends BBDialog
     methodend
     
     REM /**
-    REM  * Method setIcon:
     REM  * @param image!: BBjImage that will be the new Icon of the main window
     REM  */
     method public void setIcon(BBjImage image!)
@@ -1223,7 +1190,6 @@ class public ImageManager extends BBDialog
     methodend
     
     REM /**
-    REM  * Method setIcon:
     REM  * @param path!: the position of the icon as an absolute path
     REM  */
     method public void setIcon(String path!)
@@ -1231,7 +1197,6 @@ class public ImageManager extends BBDialog
     methodend
     
 	rem /**
-	rem  * Method btnCancel__ON_BUTTON_PUSH:
 	rem  * Event handler for the ON_BUTTON_PUSH event for btnCancel
 	rem  * @param BBjButtonPushEvent
 	rem  */
@@ -1243,7 +1208,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	REM /** 
-	REM  * Method Window101__ON_RESIZE:
 	REM  * creates a Timer and calls the method doResize 
     REM  * @param BBjResizeEvent
     REM  */
@@ -1252,7 +1216,6 @@ class public ImageManager extends BBDialog
     methodend
 
 	rem /**
-	rem  * Method Window101__ON_RESIZE: 
 	rem  * Resizes the window properly 
 	rem  * Event handler for the ON_RESIZE event for Window101
 	rem  * @param BBjResizeEvent
@@ -1402,7 +1365,6 @@ class public ImageManager extends BBDialog
 	methodend
 	
 	Rem /** 
-    Rem  * Method getImages:
     Rem  * @return returns a arraylist full of blobs. 
     Rem  */
 	method public ArrayList getImages()
