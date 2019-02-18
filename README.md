@@ -2,7 +2,7 @@
 
  ## Introduction
 First of all, this is what en empty ImageManager looks like.
-!(https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
+![https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
 The Imagemanager can contain an maximum of **15** images.
 **Note**<br>
 <ul>
