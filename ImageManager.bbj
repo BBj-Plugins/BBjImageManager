@@ -578,6 +578,9 @@ class public ImageManager extends BBDialog
 	    
  	    data! = #checkImages(data!)
 	    new! = data!.size()
+	    if new! = 0 then
+	        methodret
+	    endif
 	    
 	    if (current! < max! and (current! + new!) <= max!) then
 	        #images!.remove(#addPic!)
@@ -613,7 +616,7 @@ class public ImageManager extends BBDialog
 	method private java.util.List checkImages(java.util.List dataList!)
 	    declare String buffer!
 	    declare ArrayList arrayList!
-	    
+
         arrayList! = new ArrayList(Arrays.asList(dataList!.toArray()))
 	    for i = arrayList!.size() -1 to 0 step -1
 	        buffer! = dataList!.get(i).toString()
