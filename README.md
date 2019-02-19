@@ -20,6 +20,9 @@
 - By clicking on the save button the ImageManager will return a blob list which you can then process in your application.
 - You can add multiple images at once.
 - You can only save the images in .png and .jpg formats. 
+
+For more information check out the javadoc:
+[javadoc](https://bbj-plugins.github.io/BBjNotificationManager/javadoc/)
  
 
  
