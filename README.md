@@ -64,7 +64,7 @@ The popup menu has 2 options
 	Will open an save dialog.
 
  
-![](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
+![ImageManagerPopUp](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPopUp.jpg)
 
 **Note**
 
@@ -80,11 +80,11 @@ The popup menu has 2 options
 
  ### The preview Button
 The preview button is the bigger button one on the left side.
-![](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
+![ImageManagerPreviewButton](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButton.jpg)
 If you right click on an image it will set in this button.
-![](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
+![ImageManagerPreviewButtonFilled](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButtonFilled.jpg)
 If you then click on that big button an new Window will open up with the image, so you can see images with greater heights and widths better.
-![](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
+![ImageManagerPreviewWindow](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewWindow.jpg)
 You can close the window by pressing **esc** or pressing the **X**
 
 **Note** 
@@ -101,7 +101,8 @@ You can drag one image on to another one and they will switch places.
 Also they are little seperators between each button. You can drag images on to them. 
 This will cause the image to go between the two images the seperator was located.
 Here an example
-![](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/
+![ImageManagerExampleInsert1](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert1.jpg)
+![ImageManagerExampleInsert2](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert2.jpg)
 
  ### The cancel button
 This button will bring up an popup wich will ask you if you really want to close the programm or else unsaved changes will be discarded.
