@@ -34,9 +34,12 @@ You can also use setImages so the ImageManager allready opens with Images.
 
  ### The **add** Button  
 If you right click the button with the **add** icon a file dialog will open up and you can navigate to the location where your images are. 
-![ImageManagerOpenDialog](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerOpenDialog.PNG)
-**Note** 
 
+
+![ImageManagerOpenDialog](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerOpenDialog.PNG)
+
+
+**Note** 
 
 
 - You can not drag the **add**.
@@ -81,14 +84,18 @@ The popup menu has 2 options
  ### The preview Button
 The preview button is the bigger button one on the left side.
 ![ImageManagerPreviewButton](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButton.jpg)
+
+
 If you right click on an image it will set in this button.
 ![ImageManagerPreviewButtonFilled](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButtonFilled.jpg)
+
+
 If you then click on that big button an new Window will open up with the image, so you can see images with greater heights and widths better.
-![ImageManagerPreviewWindow](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewWindow.jpg)
 You can close the window by pressing **esc** or pressing the **X**
+![ImageManagerPreviewWindow](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewWindow.jpg)
+
 
 **Note** 
-
 
 
 - If the image`s height and width is greater then the window it will be scaled down. 
@@ -98,9 +105,10 @@ You can close the window by pressing **esc** or pressing the **X**
  
  ### Mooving the images
 You can drag one image on to another one and they will switch places.
-Also they are little seperators between each button. You can drag images on to them. 
+Also they are little seperators between each button. 
+You can drag images on to them. 
 This will cause the image to go between the two images the seperator was located.
-Here an example
+Here is an example:
 ![ImageManagerExampleInsert1](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert1.jpg)
 ![ImageManagerExampleInsert2](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert2.jpg)
 
