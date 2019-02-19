@@ -1,6 +1,6 @@
  # ImageManager
 
-First of all, this is what en empty ImageManager looks like.
+Welcome to the Introduction of the ImageManager.
 ![ImageManagerEmpty](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
 The ImageManager can contain an maximum of **15** images.
 
@@ -11,10 +11,14 @@ The ImageManager can contain an maximum of **15** images.
 - The valid image types are: png, jpg and jfif.
  
 You can change the Title and the Icon.
+
+
 ![ImageManagerTitlebar](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerTitlebar.PNG)
 
  ## Usage 
 They are 3 ways to get images in the ImageManager while it is running.
+
+
 You can also use setImages so the ImageManager allready opens with Images.
 
 - Drag and Drop
@@ -105,9 +109,17 @@ You can close the window by pressing **esc** or pressing the **X**.
  
  ### Mooving the images
 You can drag one image on to another one and they will switch places.
+
+
 Also they are little seperators between each button. 
+
+
 You can drag images on to them. 
+
+
 This will cause the image to go between the two images the seperator was located.
+
+
 Here is an example:
 ![ImageManagerExampleInsert1](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert1.jpg)
 ![ImageManagerExampleInsert2](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert2.jpg)
