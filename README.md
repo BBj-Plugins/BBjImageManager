@@ -22,6 +22,8 @@
 - You can only save the images in .png and .jpg formats. 
 
 For more information check out the javadoc:
+
+
 [javadoc](https://bbj-plugins.github.io/BBjNotificationManager/javadoc/)
  
 
