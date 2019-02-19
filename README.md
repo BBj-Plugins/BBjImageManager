@@ -21,7 +21,7 @@
 - You can add multiple images at once.
 - You can only save the images in .png and .jpg formats. 
 
-For more information check out the [javadoc](https://bbj-plugins.github.io/BBjNotificationManager/javadoc/)
+For more information check out the [javadoc](https://bbj-plugins.github.io/ImageManager/javadoc/)
  
 
  
