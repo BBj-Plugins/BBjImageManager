@@ -1,13 +1,14 @@
  # ImageManager
 
-Welcome to the Introduction of the ImageManager.
-![ImageManagerEmpty](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
-The ImageManager can contain an maximum of **15** images.
+ ## Introduction
+ The ImageManager lets you display a list of images(maximum 15) whose order you can adapt by either removing and adding the images in the desired order, or by dragging and dropping them into the desired location.
+ By clicking on an image loaded into the ImageManager, the preview button on the left will automatically show the selected image.
+ By clicking on the preview button the image will be displayed in a separate preview window(full screen).s
+![ImageManagerEmpty](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerExampleInsert1.jpg)
 
 
 **Note**
-- You can not change then maximum amount of images an ImageManager can hold.
-- If you add more nothing will happen and if you then delete some they will not be inserted then.
+- You can not change then maximum amount of images.
 - The valid image types are: png, jpg and jfif.
  
 You can change the Title and the Icon.
@@ -16,96 +17,15 @@ You can change the Title and the Icon.
 ![ImageManagerTitlebar](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerTitlebar.PNG)
 
  ## Usage 
-They are 3 ways to get images in the ImageManager while it is running.
-
-
-You can also use setImages so the ImageManager allready opens with Images.
-
-- Drag and Drop
-- The **add** button
-- The popup menu
- 
- ### Drag and Drop
-![ImageManagerDragAndDrop](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerDragAndDrop.jpg)
+ You can load images into the ImageManager by:
+ - Dragging and Dropping the image(s) 
+ - by clicking the add button and then selecting the images you want to add.
+ - by right clicking on the empty image buttons and selecting the open option.
 
 **Note**
-
-- You can Drag multiple images.
-- If you drag something that is not an image the programm will do nothing.
-- If the maximum of images is reached it will also do nothing.
-- You can drag images between 2 to insert it there.
-
-
- ### The **add** Button  
-If you right click the button with the **add** button a file dialog will open up and you can navigate to the location where your images are. 
-
-
-![ImageManagerOpenDialog](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerOpenDialog.PNG)
-
-
-**Note** 
-
-
-- You can not drag the **add** button.
-- You can only select .png, .jpg and .jfif.
-- While the open dialog is active the main window is disabled.
-- The open dialog will remember your last location and you will start there next time you open it.
-- You can even select multiple images.
-- If you choose one or more images the **add** button will moove behind the last image.
-- If the maximum of 15 images is reached the **add** button will dissapear and come back if there are less then 15.
-- The dialog can also be closed with the **esc** key.
-
-
- ### The Popup menu
-If you left click on a button a popup menu will apear.
-The popup menu has 2 options:
-
-
-1. open
-
-
-	Will open an open dialog, rules are the same as for the one on the **add** button.
-2. save
-
-
-	Will open an save dialog.
-
- 
-![ImageManagerPopUp](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPopUp.jpg)
-
-**Note**
-
-
-
-- Popup menu won`t be shown on the **add** button and on the big button on the left.
-- The **save** option is disabled if the button does not contain an image.
-- The **open** option is disabled if the button does contain an image.
-- The save dialog will also remember your last location.
-- The save dialog can only save in png and jpg.
-- The dialog can also be closed with the **esc** key.
-
-
- ### The preview Button
-The preview button is the bigger button one on the left side.
-![ImageManagerPreviewButton](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButton.jpg)
-
-
-If you right click on an image it will set in this button.
-![ImageManagerPreviewButtonFilled](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewButtonFilled.jpg)
-
-
-If you then click on that big button an new Window will open up with the image, so you can see images with greater heights and widths better.
-You can close the window by pressing **esc** or pressing the **X**.
-![ImageManagerPreviewWindow](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewWindow.jpg)
-
-
-**Note** 
-
-
-- If the image`s height and width is greater then the window it will be scaled down. 
-- If the image`s height and width is smaller then the window it will not be scaled up. 
-- The window is always gonna be fullscreen suitable for your screenbounds.
-
+- Only valid image formats can be used: .png, .jpg, .jfif
+- You can add multiple images at once.
+- You can only save the images in .png and .jpg. 
  
  ### Mooving the images
 You can drag one image on to another one and they will switch places.
