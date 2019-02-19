@@ -18,11 +18,9 @@ You can change the Title and the Icon.
 They are 3 ways to get images in the ImageManager while it is running. <br>
 You can also use setImages so the ImageManager allready opens with Images.
 
-<ol>
-<li>Drag and Drop</li>
-<li>The **plus** button</li>
-<li>The popup menu</li>
-</ol>
+- Drag and Drop
+- The **plus** button
+- The popup menu
  
  ### Drag and Drop
 ![ImageManagerDragAndDrop](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerDragAndDrop.jpg)
