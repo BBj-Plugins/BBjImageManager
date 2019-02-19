@@ -145,8 +145,8 @@ class public ImageManager extends BBDialog
         if #API!.isInMDI() then #MDI!=#API!.getMDI()
         
         #popupMenu! = #SysGui!.addPopupMenu()
-        #popupMenu!.addMenuItem(-1,"öffnen")
-        #popupMenu!.addMenuItem(-2,"speichern unter")
+        #popupMenu!.addMenuItem(-1,"open             ")
+        #popupMenu!.addMenuItem(-2,"save             ")
         
         if #Wnd!<>null() then
             #setCallbacks()

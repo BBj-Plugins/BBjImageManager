@@ -6,8 +6,6 @@ The Imagemanager can contain an maximum of **15** images.
 
 
 **Note**
-
-
 - You can not change then maximum amount of images an ImageManager can hold.
 - If you add more nothing will happen and if you then delete some they will not be inserted then.
 - The valid image types are: png, jpg and jfif.
@@ -16,7 +14,6 @@ You can change the Title and the Icon.
 ![ImageManagerTitlebar](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerTitlebar.PNG)
 
  ## Usage 
-
 They are 3 ways to get images in the ImageManager while it is running. <br>
 You can also use setImages so the ImageManager allready opens with Images.
 
@@ -58,8 +55,12 @@ The popup menu has 2 options
 
 
 1. open
+
+
 	Will open an open dialog, rules are the same as for the one on **add** button.
 2. save
+
+
 	Will open an save dialog.
 
  
