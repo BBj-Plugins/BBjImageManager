@@ -2,7 +2,7 @@
 
 First of all, this is what en empty ImageManager looks like.
 ![ImageManagerEmpty](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerEmpty.PNG)
-The Imagemanager can contain an maximum of **15** images.
+The ImageManager can contain an maximum of **15** images.
 
 
 **Note**
@@ -33,7 +33,7 @@ You can also use setImages so the ImageManager allready opens with Images.
 
 
  ### The **add** Button  
-If you right click the button with the **add** icon a file dialog will open up and you can navigate to the location where your images are. 
+If you right click the button with the **add** button a file dialog will open up and you can navigate to the location where your images are. 
 
 
 ![ImageManagerOpenDialog](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerOpenDialog.PNG)
@@ -42,25 +42,25 @@ If you right click the button with the **add** icon a file dialog will open up a
 **Note** 
 
 
-- You can not drag the **add**.
+- You can not drag the **add** button.
 - You can only select .png, .jpg and .jfif
 - While the open dialog is active the main window is disabled.
 - The open dialog will remember your last location and you will start there next time you open it.
 - You can even select multiple images.
-- If you choose one or more images the **add** icon will moove behind the last image.
-- If the maximum of 15 images is reached the **add** will dissapear and come back if there are less then 15.
+- If you choose one or more images the **add** button will moove behind the last image.
+- If the maximum of 15 images is reached the **add** button will dissapear and come back if there are less then 15.
 - The dialog can also be closed with the **esc** key.
 
 
  ### The Popup menu
 If you left click on a button a popup menu will apear.
-The popup menu has 2 options
+The popup menu has 2 options:
 
 
 1. open
 
 
-	Will open an open dialog, rules are the same as for the one on **add** button.
+	Will open an open dialog, rules are the same as for the one on the **add** button.
 2. save
 
 
