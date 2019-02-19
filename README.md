@@ -14,7 +14,7 @@ You can change the Title and the Icon.
 ![ImageManagerTitlebar](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerTitlebar.PNG)
 
  ## Usage 
-They are 3 ways to get images in the ImageManager while it is running. <br>
+They are 3 ways to get images in the ImageManager while it is running.
 You can also use setImages so the ImageManager allready opens with Images.
 
 - Drag and Drop
@@ -43,7 +43,7 @@ If you right click the button with the **add** button a file dialog will open up
 
 
 - You can not drag the **add** button.
-- You can only select .png, .jpg and .jfif
+- You can only select .png, .jpg and .jfif.
 - While the open dialog is active the main window is disabled.
 - The open dialog will remember your last location and you will start there next time you open it.
 - You can even select multiple images.
@@ -73,10 +73,10 @@ The popup menu has 2 options:
 
 
 
-- Popup menu won`t be shown on the **add** button and on the big button on the left
+- Popup menu won`t be shown on the **add** button and on the big button on the left.
 - The **save** option is disabled if the button does not contain an image.
 - The **open** option is disabled if the button does contain an image.
-- The save dialog will also remember your last location
+- The save dialog will also remember your last location.
 - The save dialog can only save in png and jpg.
 - The dialog can also be closed with the **esc** key.
 
@@ -91,7 +91,7 @@ If you right click on an image it will set in this button.
 
 
 If you then click on that big button an new Window will open up with the image, so you can see images with greater heights and widths better.
-You can close the window by pressing **esc** or pressing the **X**
+You can close the window by pressing **esc** or pressing the **X**.
 ![ImageManagerPreviewWindow](https://raw.githubusercontent.com/BBj-Plugins/ImageManager/master/docs/screenshots/ImageManagerPreviewWindow.jpg)
 
 
@@ -100,7 +100,7 @@ You can close the window by pressing **esc** or pressing the **X**
 
 - If the image`s height and width is greater then the window it will be scaled down. 
 - If the image`s height and width is smaller then the window it will not be scaled up. 
-- The window is always gonna be fullscreen suitable for your screenbounds
+- The window is always gonna be fullscreen suitable for your screenbounds.
 
  
  ### Mooving the images
