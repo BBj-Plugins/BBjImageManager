@@ -14,6 +14,9 @@ use java.awt.MouseInfo
 use java.util.concurrent.TimeUnit
 use javax.sql.rowset.serial.SerialBlob
 use java.sql.Blob
+use ::bbtranslator.bbj::BBTranslator
+use ::bbtranslator.bbj::BBTranslations
+
 
 use ::ImageManager/src/Image.bbj::Image
 use ::BBXImage.bbj::BBXImage
@@ -56,6 +59,7 @@ class public ImageManager extends BBDialog
     field private String wndIconPath!
     field private int avContextPreview!
     field private int avContextDialog!
+    field private BBTranslator translator!
 
     field private static String stdTitle! = "ImageManager"
     field private static Image addPic!  
@@ -123,13 +127,29 @@ class public ImageManager extends BBDialog
 	field protected BBjButton C_btnCancel!
 	rem /** DLGWIZ_FLC_END **/
 
-
-
     rem /**
     rem * Constructor ImageManager
     rem */
     method public ImageManager()
         #super!("ImageManager/res/ImageManager.arc",101)
+        #init("en")
+    methodend
+    
+    rem /**
+    rem * Constructor ImageManager
+    rem * 
+    rem * @param langauage: you can set the language, for more see the i18n folder
+    rem  * default is englisch
+    rem */
+    method public ImageManager(String language!)
+        #super!("ImageManager/res/ImageManager.arc",101)
+        #init(language!)
+    methodend
+    
+    rem /**
+    rem * gets called by the constructors
+    rem */
+    method private void init(String language!)
         #images! = new ArrayList()
         rem Check if BBjSysGui object is still valid. If not re-create it.
         #SysGui!.getContext(err=*next); sg_ok=1
@@ -144,13 +164,14 @@ class public ImageManager extends BBDialog
         #Wnd!=#super!.getWndTop()
         if #API!.isInMDI() then #MDI!=#API!.getMDI()
         
+        #translator! = BBTranslator.getInstance("language",language!,"","ImageManager/i18n/")
         #popupMenu! = #SysGui!.addPopupMenu()
-        #popupMenu!.addMenuItem(-1,"open             ")
-        #popupMenu!.addMenuItem(-2,"save             ")
+        #popupMenu!.addMenuItem(-1,#translator!.getTranslation("popup_menu_open"))
+        #popupMenu!.addMenuItem(-2,#translator!.getTranslation("popup_menu_save"))
         
         if #Wnd!<>null() then
             #setCallbacks()
-        endif
+        endif  
     methodend
 
     rem /**
@@ -350,6 +371,9 @@ class public ImageManager extends BBDialog
         #insert!.add(15,#C_btnInsert15!)
         #insert!.add(16,#C_btnInsert16!)
         #insert!.add(17,#C_btnInsert17!)
+        
+        #C_btnSave!.setText(#translator!.getTranslation("save_button")) 
+        #C_btnCancel!.setText(#translator!.getTranslation("cancel_button"))
         
         #avContextPreview! = -1
         #avContextDialog! = -1
@@ -955,7 +979,7 @@ class public ImageManager extends BBDialog
         declare BBjFileChooser fch!
         fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
         fch!.setMultiSelectionEnabled(1)
-        fch!.setApproveButtonText("open")
+        fch!.setApproveButtonText(#translator!.getTranslation("open_dialog_open_button"))
         fch!.setFileSelectionMode(fch!.FILES_ONLY)
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!,"approveOpen")
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
@@ -975,7 +999,7 @@ class public ImageManager extends BBDialog
 	method private void initSaveDialog(String dir!, String flag!)
 	    declare BBjFileChooser fch!
         fch! = #openDialog!.addFileChooser(900,0,0,#openDialog!.getWidth(),#openDialog!.getHeight(),dir!,flag!)
-        fch!.setApproveButtonText("save")
+        fch!.setApproveButtonText(#translator!.getTranslation("save_dialog_save_button"))
         fch!.setFileSelectionMode(fch!.FILES_ONLY)
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_APPROVE, #this!, "approveSave")
         fch!.setCallback(#SysGui!.ON_FILECHOOSER_CANCEL, #this!, "cancel")
@@ -1204,7 +1228,7 @@ class public ImageManager extends BBDialog
 	rem  * @param BBjButtonPushEvent
 	rem  */
 	method public void btnCancel__ON_BUTTON_PUSH(BBjButtonPushEvent pEvent!)
-	    a = msgbox("Unsaved changes will be dismissed",1,"Warning")
+	    a = msgbox(#translator!.getTranslation("cancel_message"),1,"Warning")
 	    if a = 1 then 
 	        #postCancelAnswer()
 	    endif    
